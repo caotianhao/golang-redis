@@ -1,6 +1,7 @@
 package client
 
 import (
+	"errors"
 	"go-redis/interface/resp"
 	"go-redis/lib/logger"
 	"go-redis/lib/sync/wait"
@@ -83,12 +84,11 @@ func (client *Client) Close() {
 func (client *Client) handleConnectionError(_ error) error {
 	err1 := client.conn.Close()
 	if err1 != nil {
-		if opErr, ok := err1.(*net.OpError); ok {
+		var opErr *net.OpError
+		if errors.As(err1, &opErr) {
 			if opErr.Err.Error() != "use of closed network connection" {
 				return err1
 			}
-		} else {
-			return err1
 		}
 	}
 	conn, err1 := net.Dial("tcp", client.addr)

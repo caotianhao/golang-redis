@@ -1,6 +1,7 @@
 package aof
 
 import (
+	"errors"
 	"go-redis/config"
 	databaseface "go-redis/interface/database"
 	"go-redis/lib/logger"
@@ -106,7 +107,11 @@ func (handler *MyAofHandler) LoadAof(maxBytes int) {
 
 	file, err := os.Open(handler.aofFilename)
 	if err != nil {
-		if _, ok := err.(*os.PathError); ok {
+		//if _, ok := err.(*os.PathError); ok {
+		//	return
+		//}
+		var pathError *os.PathError
+		if errors.As(err, &pathError) {
 			return
 		}
 		logger.Warn(err)

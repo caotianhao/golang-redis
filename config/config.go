@@ -88,6 +88,8 @@ func parse(src io.Reader) *ServerProperties {
 					slice := strings.Split(value, ",")
 					fieldVal.Set(reflect.ValueOf(slice))
 				}
+			default:
+				panic("unhandled default case")
 			}
 		}
 	}

@@ -6,6 +6,7 @@ package handler
 
 import (
 	"context"
+	"errors"
 	"go-redis/cluster"
 	"go-redis/config"
 	"go-redis/database"
@@ -67,7 +68,7 @@ func (h *RespHandler) Handle(ctx context.Context, conn net.Conn) {
 	for payload := range ch {
 		if payload.Err != nil {
 			if payload.Err == io.EOF ||
-				payload.Err == io.ErrUnexpectedEOF ||
+				errors.Is(payload.Err, io.ErrUnexpectedEOF) ||
 				strings.Contains(payload.Err.Error(), "use of closed network connection") {
 				// connection closed
 				h.closeClient(client)
