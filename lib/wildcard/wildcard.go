@@ -24,18 +24,18 @@ func (i *item) contains(c byte) bool {
 			return true
 		}
 		var (
-			min uint8 = 255
-			max uint8 = 0
+			minS uint8 = 255
+			maxS uint8 = 0
 		)
 		for k := range i.set {
-			if min > k {
-				min = k
+			if minS > k {
+				minS = k
 			}
-			if max < k {
-				max = k
+			if maxS < k {
+				maxS = k
 			}
 		}
-		return c >= min && c <= max
+		return c >= minS && c <= maxS
 	} else {
 		_, ok := i.set[c]
 		return !ok
