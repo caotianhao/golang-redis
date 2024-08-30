@@ -7,6 +7,11 @@ package handler
 import (
 	"context"
 	"errors"
+	"io"
+	"net"
+	"strings"
+	"sync"
+
 	"go-redis/cluster"
 	"go-redis/config"
 	"go-redis/database"
@@ -16,10 +21,6 @@ import (
 	"go-redis/resp/connection"
 	"go-redis/resp/parser"
 	"go-redis/resp/reply"
-	"io"
-	"net"
-	"strings"
-	"sync"
 )
 
 var (
@@ -55,7 +56,7 @@ func (h *RespHandler) closeClient(client *connection.Connection) {
 }
 
 // Handle receives and executes redis commands
-func (h *RespHandler) Handle(ctx context.Context, conn net.Conn) {
+func (h *RespHandler) Handle(_ context.Context, conn net.Conn) {
 	if h.closing.Get() {
 		// closing handler refuse new connection
 		_ = conn.Close()

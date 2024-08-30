@@ -5,7 +5,11 @@ package cluster
 import (
 	"context"
 	"fmt"
+	"runtime/debug"
+	"strings"
+
 	pool "github.com/jolestar/go-commons-pool/v2"
+
 	"go-redis/config"
 	"go-redis/database"
 	databaseface "go-redis/interface/database"
@@ -13,8 +17,6 @@ import (
 	"go-redis/lib/consistenthash"
 	"go-redis/lib/logger"
 	"go-redis/resp/reply"
-	"runtime/debug"
-	"strings"
 )
 
 // MyClusterDatabase represents a node of godis cluster
@@ -44,7 +46,7 @@ func MakeClusterDatabase() *MyClusterDatabase {
 	cluster.peerPicker.AddNode(nodes...)
 	ctx := context.Background()
 	for _, peer := range config.Properties.Peers {
-		cluster.peerConnection[peer] = pool.NewObjectPoolWithDefaultConfig(ctx, &connectionFactory{
+		cluster.peerConnection[peer] = pool.NewObjectPoolWithDefaultConfig(ctx, &connFactory{
 			Peer: peer,
 		})
 	}
@@ -53,33 +55,34 @@ func MakeClusterDatabase() *MyClusterDatabase {
 }
 
 // CmdFunc represents the handler of a redis command
-type CmdFunc func(cluster *MyClusterDatabase, c resp.Connection, cmdAndArgs [][]byte) resp.Reply
+type CmdFunc func(cluster *MyClusterDatabase, c resp.Connection, args [][]byte) resp.Reply
 
 // Close stops current node of cluster
-func (cluster *MyClusterDatabase) Close() {
-	cluster.db.Close()
+func (cl *MyClusterDatabase) Close() {
+	cl.db.Close()
 }
 
 var router = makeRouter()
 
 // Exec executes command on cluster
-func (cluster *MyClusterDatabase) Exec(c resp.Connection, cmdLine [][]byte) (result resp.Reply) {
+func (cl *MyClusterDatabase) Exec(c resp.Connection, cmdLine [][]byte) (res resp.Reply) {
 	defer func() {
 		if err := recover(); err != nil {
 			logger.Warn(fmt.Sprintf("error occurs: %v\n%s", err, string(debug.Stack())))
-			result = &reply.UnknownErrReply{}
+			res = &reply.UnknownErrReply{}
 		}
 	}()
 	cmdName := strings.ToLower(string(cmdLine[0]))
 	cmdFunc, ok := router[cmdName]
 	if !ok {
-		return reply.MakeErrReply("ERR unknown command '" + cmdName + "', or not supported in cluster mode")
+		return reply.MakeErrReply("ERR unknown command '" +
+			cmdName + "', or not supported in cluster mode")
 	}
-	result = cmdFunc(cluster, c, cmdLine)
+	res = cmdFunc(cl, c, cmdLine)
 	return
 }
 
 // AfterClientClose does some clean after client close connection
-func (cluster *MyClusterDatabase) AfterClientClose(c resp.Connection) {
-	cluster.db.AfterClientClose(c)
+func (cl *MyClusterDatabase) AfterClientClose(c resp.Connection) {
+	cl.db.AfterClientClose(c)
 }

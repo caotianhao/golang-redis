@@ -3,13 +3,14 @@ package parser
 import (
 	"bufio"
 	"errors"
-	"go-redis/interface/resp"
-	"go-redis/lib/logger"
-	"go-redis/resp/reply"
 	"io"
 	"runtime/debug"
 	"strconv"
 	"strings"
+
+	"go-redis/interface/resp"
+	"go-redis/lib/logger"
+	"go-redis/resp/reply"
 )
 
 // Payload stores redis.Reply or error

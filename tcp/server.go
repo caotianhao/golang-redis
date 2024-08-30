@@ -7,14 +7,15 @@ package tcp
 import (
 	"context"
 	"fmt"
-	"go-redis/interface/tcp"
-	"go-redis/lib/logger"
 	"net"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 	"time"
+
+	"go-redis/interface/tcp"
+	"go-redis/lib/logger"
 )
 
 // Config stores tcp handler properties
@@ -46,20 +47,20 @@ func ListenAndServeWithSignal(cfg *Config, handler tcp.Handler) error {
 }
 
 // ListenAndServe binds port and handle requests, blocking until close
-func ListenAndServe(listener net.Listener, handler tcp.Handler, closeChan <-chan struct{}) {
+func ListenAndServe(listener net.Listener, h tcp.Handler, closeCh <-chan struct{}) {
 	// listen signal
 	go func() {
-		<-closeChan
+		<-closeCh
 		logger.Info("shutting down...")
 		_ = listener.Close() // listener.Accept() will return err immediately
-		_ = handler.Close()  // close connections
+		_ = h.Close()        // close connections
 	}()
 
 	// listen port
 	defer func() {
 		// close during unexpected error
 		_ = listener.Close()
-		_ = handler.Close()
+		_ = h.Close()
 	}()
 	ctx := context.Background()
 	var waitDone sync.WaitGroup
@@ -75,7 +76,7 @@ func ListenAndServe(listener net.Listener, handler tcp.Handler, closeChan <-chan
 			defer func() {
 				waitDone.Done()
 			}()
-			handler.Handle(ctx, conn)
+			h.Handle(ctx, conn)
 		}()
 	}
 	waitDone.Wait()

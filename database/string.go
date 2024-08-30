@@ -1,12 +1,13 @@
 package database
 
 import (
+	"strconv"
+	"strings"
+
 	"go-redis/interface/database"
 	"go-redis/interface/resp"
 	"go-redis/lib/utils"
 	"go-redis/resp/reply"
-	"strconv"
-	"strings"
 )
 
 func (db *DB) getAsString(key string) ([]byte, reply.ErrorReply) {
@@ -336,8 +337,10 @@ func execAppend(db *DB, args [][]byte) resp.Reply {
 	return reply.MakeIntReply(int64(len(bytes)))
 }
 
-// execSetRange overwrites part of the string stored at key, starting at the specified offset.
-// If the offset is larger than the current length of the string at key, the string is padded with zero-bytes.
+// execSetRange overwrites part of the string stored at key,
+// starting at the specified offset.
+// If the offset is larger than the current length of the string at key,
+// the string is padded with zero-bytes.
 func execSetRange(db *DB, args [][]byte) resp.Reply {
 	key := string(args[0])
 	offset, errNative := strconv.ParseInt(string(args[1]), 10, 64)

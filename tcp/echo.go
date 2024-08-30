@@ -7,13 +7,14 @@ package tcp
 import (
 	"bufio"
 	"context"
-	"go-redis/lib/logger"
-	"go-redis/lib/sync/atomic"
-	"go-redis/lib/sync/wait"
 	"io"
 	"net"
 	"sync"
 	"time"
+
+	"go-redis/lib/logger"
+	"go-redis/lib/sync/atomic"
+	"go-redis/lib/sync/wait"
 )
 
 // EchoHandler echos received line to client, using for test
@@ -41,7 +42,7 @@ func (c *EchoClient) Close() error {
 }
 
 // Handle echos received line to client
-func (h *EchoHandler) Handle(ctx context.Context, conn net.Conn) {
+func (h *EchoHandler) Handle(_ context.Context, conn net.Conn) {
 	//func (h *EchoHandler) Handle(conn net.Conn) {
 	if h.closing.Get() {
 		// closing handler refuse new connection

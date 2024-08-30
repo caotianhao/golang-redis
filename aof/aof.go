@@ -2,6 +2,11 @@ package aof
 
 import (
 	"errors"
+	"io"
+	"os"
+	"strconv"
+	"sync"
+
 	"go-redis/config"
 	databaseface "go-redis/interface/database"
 	"go-redis/lib/logger"
@@ -9,18 +14,12 @@ import (
 	"go-redis/resp/connection"
 	"go-redis/resp/parser"
 	"go-redis/resp/reply"
-	"io"
-	"os"
-	"strconv"
-	"sync"
 )
 
 // CmdLine is alias for [][]byte, represents a command line
 type CmdLine = [][]byte
 
-const (
-	aofQueueSize = 1 << 16
-)
+const aofQueueSize = 1 << 16
 
 type payload struct {
 	cmdLine CmdLine
@@ -107,9 +106,6 @@ func (handler *MyAofHandler) LoadAof(maxBytes int) {
 
 	file, err := os.Open(handler.aofFilename)
 	if err != nil {
-		//if _, ok := err.(*os.PathError); ok {
-		//	return
-		//}
 		var pathError *os.PathError
 		if errors.As(err, &pathError) {
 			return

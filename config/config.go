@@ -2,12 +2,13 @@ package config
 
 import (
 	"bufio"
-	"go-redis/lib/logger"
 	"io"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"go-redis/lib/logger"
 )
 
 // ServerProperties defines global config properties

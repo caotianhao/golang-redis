@@ -2,11 +2,12 @@
 package database
 
 import (
+	"strings"
+
 	"go-redis/datastruct/dict"
 	"go-redis/interface/database"
 	"go-redis/interface/resp"
 	"go-redis/resp/reply"
-	"strings"
 )
 
 // DB stores data and execute user's commands

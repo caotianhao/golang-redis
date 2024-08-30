@@ -2,10 +2,11 @@ package connection
 
 import (
 	"bytes"
-	"go-redis/lib/sync/wait"
 	"net"
 	"sync"
 	"time"
+
+	"go-redis/lib/sync/wait"
 )
 
 // Connection represents a connection with a redis-cli

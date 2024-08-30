@@ -2,14 +2,15 @@ package database
 
 import (
 	"fmt"
+	"runtime/debug"
+	"strconv"
+	"strings"
+
 	"go-redis/aof"
 	"go-redis/config"
 	"go-redis/interface/resp"
 	"go-redis/lib/logger"
 	"go-redis/resp/reply"
-	"runtime/debug"
-	"strconv"
-	"strings"
 )
 
 // StandaloneDatabase is a set of multiple database set
@@ -50,8 +51,7 @@ func NewStandaloneDatabase() *StandaloneDatabase {
 
 // Exec executes command
 // parameter `cmdLine` contains command and its arguments, for example: "set key value"
-func (mdb *StandaloneDatabase) Exec(c resp.Connection, cmdLine [][]byte) (result resp.Reply) {
-
+func (mdb *StandaloneDatabase) Exec(c resp.Connection, line [][]byte) (result resp.Reply) {
 	defer func() {
 		if err := recover(); err != nil {
 			logger.Warn(fmt.Sprintf("error occurs: %v\n%s", err, string(debug.Stack())))
@@ -59,12 +59,12 @@ func (mdb *StandaloneDatabase) Exec(c resp.Connection, cmdLine [][]byte) (result
 		}
 	}()
 
-	cmdName := strings.ToLower(string(cmdLine[0]))
+	cmdName := strings.ToLower(string(line[0]))
 	if cmdName == "select" {
-		if len(cmdLine) != 2 {
+		if len(line) != 2 {
 			return reply.MakeArgNumErrReply("select")
 		}
-		return execSelect(c, mdb, cmdLine[1:])
+		return execSelect(c, mdb, line[1:])
 	}
 	// normal commands
 	dbIndex := c.GetDBIndex()
@@ -72,7 +72,7 @@ func (mdb *StandaloneDatabase) Exec(c resp.Connection, cmdLine [][]byte) (result
 		return reply.MakeErrReply("ERR DB index is out of range")
 	}
 	selectedDB := mdb.dbSet[dbIndex]
-	return selectedDB.Exec(cmdLine)
+	return selectedDB.Exec(line)
 }
 
 // Close graceful shutdown database

@@ -2,15 +2,16 @@ package client
 
 import (
 	"errors"
+	"net"
+	"runtime/debug"
+	"sync"
+	"time"
+
 	"go-redis/interface/resp"
 	"go-redis/lib/logger"
 	"go-redis/lib/sync/wait"
 	"go-redis/resp/parser"
 	"go-redis/resp/reply"
-	"net"
-	"runtime/debug"
-	"sync"
-	"time"
 )
 
 // Client is a pipeline mode redis client

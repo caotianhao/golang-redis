@@ -1,8 +1,6 @@
 package database
 
-import (
-	"go-redis/interface/resp"
-)
+import "go-redis/interface/resp"
 
 // CmdLine is alias for [][]byte, represents a command line
 type CmdLine = [][]byte

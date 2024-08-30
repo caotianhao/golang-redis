@@ -1,8 +1,6 @@
 package database
 
-import (
-	"strings"
-)
+import "strings"
 
 var cmdTable = make(map[string]*command)
 

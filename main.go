@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"go-redis/config"
 	"go-redis/lib/logger"
 	"go-redis/resp/handler"
 	"go-redis/tcp"
-	"os"
 )
 
 const configFile string = "redis.conf"

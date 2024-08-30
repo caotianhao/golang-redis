@@ -3,15 +3,17 @@ package cluster
 import (
 	"context"
 	"errors"
+
 	"github.com/jolestar/go-commons-pool/v2"
+
 	"go-redis/resp/client"
 )
 
-type connectionFactory struct {
+type connFactory struct {
 	Peer string
 }
 
-func (f *connectionFactory) MakeObject(context.Context) (*pool.PooledObject, error) {
+func (f *connFactory) MakeObject(context.Context) (*pool.PooledObject, error) {
 	c, err := client.MakeClient(f.Peer)
 	if err != nil {
 		return nil, err
@@ -20,8 +22,8 @@ func (f *connectionFactory) MakeObject(context.Context) (*pool.PooledObject, err
 	return pool.NewPooledObject(c), nil
 }
 
-func (f *connectionFactory) DestroyObject(ctx context.Context, object *pool.PooledObject) error {
-	c, ok := object.Object.(*client.Client)
+func (f *connFactory) DestroyObject(_ context.Context, obj *pool.PooledObject) error {
+	c, ok := obj.Object.(*client.Client)
 	if !ok {
 		return errors.New("type mismatch")
 	}
@@ -29,17 +31,17 @@ func (f *connectionFactory) DestroyObject(ctx context.Context, object *pool.Pool
 	return nil
 }
 
-func (f *connectionFactory) ValidateObject(context.Context, *pool.PooledObject) bool {
+func (f *connFactory) ValidateObject(context.Context, *pool.PooledObject) bool {
 	// do validate
 	return true
 }
 
-func (f *connectionFactory) ActivateObject(context.Context, *pool.PooledObject) error {
+func (f *connFactory) ActivateObject(context.Context, *pool.PooledObject) error {
 	// do activate
 	return nil
 }
 
-func (f *connectionFactory) PassivateObject(context.Context, *pool.PooledObject) error {
+func (f *connFactory) PassivateObject(context.Context, *pool.PooledObject) error {
 	// do passivate
 	return nil
 }
