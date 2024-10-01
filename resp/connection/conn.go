@@ -20,6 +20,7 @@ type Connection struct {
 	selectedDB int
 }
 
+// NewConn a new conn
 func NewConn(conn net.Conn) *Connection {
 	return &Connection{
 		conn: conn,

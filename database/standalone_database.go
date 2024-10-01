@@ -77,9 +77,9 @@ func (mdb *StandaloneDatabase) Exec(c resp.Connection, line [][]byte) (result re
 
 // Close graceful shutdown database
 func (mdb *StandaloneDatabase) Close() {
-
 }
 
+// AfterClientClose 在客户端关闭连接后执行
 func (mdb *StandaloneDatabase) AfterClientClose(_ resp.Connection) {
 }
 
